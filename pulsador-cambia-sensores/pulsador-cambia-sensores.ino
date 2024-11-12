@@ -3,6 +3,8 @@
 #define NTC_PIN A0
 #define LDR_PIN A1
 #define LM35_PIN A2
+//no se si era digital o analog
+//#define CNY70_PIN A3
 int ntcResistencia = 10000;
 //int trigger = 5;
 //int echo = 4; 
@@ -12,6 +14,7 @@ int rojo = 2;
 int pulsador = 4;
 int PER = 300;
 int sensor = 1;
+//para los infrarrojos de momento usaremos esto
 uint8_t cny70 = 3;
 
 void setup() {
@@ -25,6 +28,7 @@ void setup() {
   //pinMode(trigger, OUTPUT);
   //pinMode(echo, INPUT);
   //digitalWrite(trigger, LOW);
+  pinMode(cny70, INPUT);
 }
 
 void loop() {
@@ -41,6 +45,7 @@ void loop() {
       delay(PER);
       break;
     case 2:
+    //SENSOR DE TEMPERATURA NTC
       PER = 500;
 
       long valorNTC = analogRead(NTC_PIN);
@@ -55,6 +60,7 @@ void loop() {
       delay(PER);
       break;
     case 3: 
+      //SENSOR DE TEMPERATURA LM35
       PER = 300;
 
       long valorLM35 = analogRead(LM35_PIN);
@@ -68,9 +74,32 @@ void loop() {
       delay(PER);
       break;
     case 4:
+    //SENSOR DE LUMINOSIDAD
       lcd.clear();
       lcd.println("LDR: luminosidad");
       lcd.print(analogRead(LDR_PIN));
+      break;
+
+    case 5:
+    //SENSOR ULTRASONIDOS
+      lcd.clear();
+      digitalWrite(trigger, HIGH);
+      delayMicroseconds(10);          //Enviamos un pulso de 10us
+      digitalWrite(trigger, LOW);
+      long t = pulseIn(echo, HIGH);
+      long d = t/59;             //escalamos el tiempo a una distancia en cm
+
+      lcd.println("Sensor HCSR04: ");
+      lcd.print(d);      //Enviamos serialmente el valor de la distancia
+      lcd.print(" cm");
+      delay(PER);
+      break;
+    
+    case 6:
+      lcd.clear();
+      lcd.print("Lectura: ");
+      lcd.print(analogRead(cny70));
+      delay(PER);
       break;
 
     default:
@@ -81,7 +110,7 @@ void loop() {
   
   if(digitalRead(pulsador)){
     sensor += 1;
-    if (sensor == 5){
+    if (sensor == 7){
       sensor = 1;
     }
   }
