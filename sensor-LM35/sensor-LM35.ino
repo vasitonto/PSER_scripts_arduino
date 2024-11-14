@@ -14,9 +14,9 @@ void setup() {
 
 void loop() {
   int valor = analogRead(LM35_PIN);
-  float mv = valor*(5000/1024);
-  float temperatura = (mv / 10)-44;
-  Serial.println(String(mv) + ", " + String(temperatura) + ", " + String(segundos));
+  float voltaje = valor*(5000/1024);
+  float temperatura = (voltaje / 10)-48;
+  Serial.println(String(voltaje) + ", " + String(temperatura) + ", " + String(segundos));
   delay(PER);
   segundos += 1;
 }
