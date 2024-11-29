@@ -1,12 +1,16 @@
 #include <LiquidCrystal.h>
 
 LiquidCrystal lcd(12, 11, 10, 9, 8, 7, 6);
-uint8_t cny70 = 3;
-const byte interruptPin = 2;
-bool interrupt = false;
-int threshold = 200;
-int counter = 0;
+const int cny70 = A5;
+const int interruptPin = 3;
+const int oscilador = 2;
+const int pinSalida = 4;
+int threshold = 400;
+int periodos = 0;
 int lecturaCNY;
+int lecturaCircuito;
+int lecturaPin3;
+int contadorVueltas;
                                     
 void setup() {
   // PERIODO DEL CHIP NE555 ES DE 220MS, 5 periodos = 1 seg aprox
@@ -14,27 +18,36 @@ void setup() {
   lcd.begin(16, 2);
   Serial.begin(9600);
   pinMode(cny70, INPUT);
-  attachInterrupt(interruptPin, ISRa, RISING);
+  pinMode(interruptPin, INPUT);
+  pinMode(oscilador, INPUT);
+  pinMode(pinSalida, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(interruptPin), ISRa, RISING);
+  attachInterrupt(digitalPinToInterrupt(oscilador), ISRb, RISING);
   // put your setup code here, to run once:
 
 }
 
 void loop() {
   lcd.clear();
-  lecturaCNY = analogRead(cny);
-  Serial.print(lecturaCNY);
-  if(analogRead(cny70) > threshold)){
-    ISRa();
+  lcd.print(contadorVueltas);
+  if(periodos == 5){
+    periodos = 0;
+    Serial.println(contadorVueltas);
+    contadorVueltas = 0;
   }
-  if(interrupt){
-    lcd.print("Interrupcion");
+
+  if(analogRead(cny70) > threshold){
+    digitalWrite(pinSalida, HIGH);
+    digitalWrite(pinSalida, LOW);
   }
-    Serial.println(counter); 
-  delay(1000);
+
+  delay(60);
 }
 
 void ISRa(){
-  digitalWrite(4, HIGH);
-  interrupt = true;
-  counter++;
+  contadorVueltas++;
+}
+
+void ISRb(){
+  periodos++;
 }
